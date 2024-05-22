@@ -68,11 +68,11 @@ def editPhoto(photo_id):
 # This is called when clicking on Delete. 
 @main.route('/photo/<int:photo_id>/delete/', methods = ['GET','POST'])
 def deletePhoto(photo_id):
-  fileResults = db.session.execute(text('select file from photo where id = ' + str(photo_id)))
+  fileResults = db.session.execute(text('select file from photo where id = :photo_id'), {'photo_id': photo_id})
   filename = fileResults.first()[0]
   filepath = os.path.join(current_app.config["UPLOAD_DIR"], filename)
   os.unlink(filepath)
-  db.session.execute(text('delete from photo where id = ' + str(photo_id)))
+  db.session.execute(text('delete from photo where id = :photo_id'), {'photo_id': photo_id})
   db.session.commit()
   
   flash('Photo id %s Successfully Deleted' % photo_id)
