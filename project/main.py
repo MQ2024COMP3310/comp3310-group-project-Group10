@@ -7,6 +7,7 @@ from .models import Photo
 from sqlalchemy import asc, text
 from . import db
 import os
+from werkzeug.utils import secure_filename
 
 main = Blueprint('main', __name__)
 
@@ -32,9 +33,9 @@ def newPhoto():
 
     if not file or not file.filename:
       flash("No file selected!", "error")
-      return redirect(request.url)
+      return redirect(url_for('main.newPhoto'))
 
-    filepath = os.path.join(current_app.config["UPLOAD_DIR"], file.filename)
+    filepath = os.path.abspath(os.path.join(current_app.config["UPLOAD_DIR"], secure_filename(file.filename)))
     file.save(filepath)
 
     newPhoto = Photo(name = request.form['user'], 
@@ -68,11 +69,11 @@ def editPhoto(photo_id):
 # This is called when clicking on Delete. 
 @main.route('/photo/<int:photo_id>/delete/', methods = ['GET','POST'])
 def deletePhoto(photo_id):
-  fileResults = db.session.execute(text('select file from photo where id = ' + str(photo_id)))
+  fileResults = db.session.execute(text('select file from photo where id = :photo_id'), {'photo_id': photo_id})
   filename = fileResults.first()[0]
   filepath = os.path.join(current_app.config["UPLOAD_DIR"], filename)
   os.unlink(filepath)
-  db.session.execute(text('delete from photo where id = ' + str(photo_id)))
+  db.session.execute(text('delete from photo where id = :photo_id'), {'photo_id': photo_id})
   db.session.commit()
   
   flash('Photo id %s Successfully Deleted' % photo_id)
