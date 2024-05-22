@@ -32,7 +32,7 @@ def newPhoto():
 
     if not file or not file.filename:
       flash("No file selected!", "error")
-      return redirect(request.url)
+      return redirect(url_for('main.newPhoto'))
 
     filepath = os.path.join(current_app.config["UPLOAD_DIR"], file.filename)
     file.save(filepath)
