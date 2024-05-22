@@ -34,7 +34,7 @@ def newPhoto():
       flash("No file selected!", "error")
       return redirect(request.url)
 
-    filepath = os.path.abspath(os.path.join(current_app.config["UPLOAD_DIR"], file.filename))
+    filepath = os.path.join(current_app.config["UPLOAD_DIR"], file.filename)
     file.save(filepath)
 
     newPhoto = Photo(name = request.form['user'], 
