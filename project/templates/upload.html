@@ -11,8 +11,8 @@ Upload a photo
 {% block content %}
 <form method="POST" enctype="multipart/form-data">
     <div class="input-container button" title="File size should be under 1MB">
-        <!-- Currently accept all files. Should be image files only. -->
-        <input type="file" name="fileToUpload" accept="*/*">
+        <!-- Accepts only .png, .jpg and .jpeg files.-->
+        <input type="file" name="fileToUpload" accept=".png, .jpg, .jpeg">
     </div>
 
     <div class="input-container">
