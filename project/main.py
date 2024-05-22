@@ -1,9 +1,11 @@
+from unittest import loader
 from flask import (
   Blueprint, render_template, request, 
   flash, redirect, url_for, send_from_directory, 
   current_app, make_response
 )
-from .models import Photo
+from flask_login import current_user, login_required
+from .models import Photo, User
 from sqlalchemy import asc, text
 from . import db
 import os
@@ -22,6 +24,7 @@ def display_file(name):
 
 # Upload a new photo
 @main.route('/upload/', methods=['GET','POST'])
+@login_required
 def newPhoto():
   if request.method == 'POST':
     file = None
@@ -50,31 +53,42 @@ def newPhoto():
 
 # This is called when clicking on Edit. Goes to the edit page.
 @main.route('/photo/<int:photo_id>/edit/', methods = ['GET', 'POST'])
+@login_required
 def editPhoto(photo_id):
   editedPhoto = db.session.query(Photo).filter_by(id = photo_id).one()
-  if request.method == 'POST':
-    if request.form['user']:
-      editedPhoto.name = request.form['user']
-      editedPhoto.caption = request.form['caption']
-      editedPhoto.description = request.form['description']
-      db.session.add(editedPhoto)
-      db.session.commit()
-      flash('Photo Successfully Edited %s' % editedPhoto.name)
-      return redirect(url_for('main.homepage'))
+  if(editedPhoto.user_id == current_user.id or current_user.is_admin):
+    if request.method == 'POST':
+      if request.form['user']:
+        editedPhoto.name = request.form['user']
+        editedPhoto.caption = request.form['caption']
+        editedPhoto.description = request.form['description']
+        db.session.add(editedPhoto)
+        db.session.commit()
+        flash('Photo Successfully Edited %s' % editedPhoto.name)
+        return redirect(url_for('main.homepage'))
+    else:
+      return render_template('edit.html', photo = editedPhoto)
   else:
-    return render_template('edit.html', photo = editedPhoto)
+    flash('You do not have permission to edit this photo!')
+    return redirect(url_for('main.homepage'))
 
 
 # This is called when clicking on Delete. 
 @main.route('/photo/<int:photo_id>/delete/', methods = ['GET','POST'])
+@login_required
 def deletePhoto(photo_id):
-  fileResults = db.session.execute(text('select file from photo where id = ' + str(photo_id)))
-  filename = fileResults.first()[0]
-  filepath = os.path.join(current_app.config["UPLOAD_DIR"], filename)
-  os.unlink(filepath)
-  db.session.execute(text('delete from photo where id = ' + str(photo_id)))
-  db.session.commit()
+  photoToDelete = db.session.query(Photo).filter_by(id = photo_id).one()
+  if(photoToDelete.user_id == current_user.id or current_user.is_admin):
+    fileResults = db.session.execute(text('select file from photo where id = ' + str(photo_id)))
+    filename = fileResults.first()[0]
+    filepath = os.path.join(current_app.config["UPLOAD_DIR"], filename)
+    os.unlink(filepath)
+    db.session.execute(text('delete from photo where id = ' + str(photo_id)))
+    db.session.commit()
   
-  flash('Photo id %s Successfully Deleted' % photo_id)
-  return redirect(url_for('main.homepage'))
+    flash('Photo id %s Successfully Deleted' % photo_id)
+    return redirect(url_for('main.homepage'))
+  else:
+    flash('You do not have permission to delete this photo!')
+    return redirect(url_for('main.homepage'))
 

@@ -1,9 +1,14 @@
 from project import db, create_app, models
 from project.models import Photo
+from project.models import User
 
 def populate_db():
    
     session = db.session()
+
+    user = User(email='sav@gmail.com', password='sav', first_name='sav', last_name='pav', is_admin=True)
+    session.add(user)
+    session.commit()
 
     photo = Photo(name = 'William Warby', caption = 'Gentoo penguin', description = 'A penguin with an orange beak standing next to a rock.', file = 'william-warby-_A_vtMMRLWM.jpg') 
     session.add(photo)
