@@ -7,7 +7,7 @@ from .models import Photo
 from sqlalchemy import asc, text
 from . import db
 import os
-import werkzeug.utils
+from werkzeug.utils import secure_filename
 
 main = Blueprint('main', __name__)
 
@@ -35,7 +35,8 @@ def newPhoto():
       flash("No file selected!", "error")
       return redirect(url_for('main.newPhoto'))
 
-    filepath = os.path.abspath(os.path.join(current_app.config["UPLOAD_DIR"], file.filename))
+    securefilename = secure_filename(file.filename)
+    filepath = os.path.abspath(os.path.join(current_app.config["UPLOAD_DIR"], file.securefilename))
     file.save(filepath)
 
     newPhoto = Photo(name = request.form['user'], 
