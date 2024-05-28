@@ -24,7 +24,7 @@ def display_file(name):
 
 # Upload a new photo
 @main.route('/upload/', methods=['GET','POST'])
-@login_required
+@login_required #prevents users without accounts from uploading photos
 def newPhoto():
   if request.method == 'POST':
     file = None
@@ -53,10 +53,10 @@ def newPhoto():
 
 # This is called when clicking on Edit. Goes to the edit page.
 @main.route('/photo/<int:photo_id>/edit/', methods = ['GET', 'POST'])
-@login_required
+@login_required #prevents users without accounts from editing photos
 def editPhoto(photo_id):
   editedPhoto = db.session.query(Photo).filter_by(id = photo_id).one()
-  if(editedPhoto.user_id == current_user.id or current_user.is_admin):
+  if(editedPhoto.user_id == current_user.id or current_user.is_admin): #checks if user is publisher of photo
     if request.method == 'POST':
       if request.form['user']:
         editedPhoto.name = request.form['user']
@@ -67,18 +67,18 @@ def editPhoto(photo_id):
         flash('Photo Successfully Edited %s' % editedPhoto.name)
         return redirect(url_for('main.homepage'))
     else:
-      return render_template('edit.html', photo = editedPhoto)
+      return render_template('edit.html', photo = editedPhoto) #allows editing if publisher
   else:
     flash('You do not have permission to edit this photo!')
-    return redirect(url_for('main.homepage'))
+    return redirect(url_for('main.homepage')) #reloads homepage if not the publisher
 
 
 # This is called when clicking on Delete. 
 @main.route('/photo/<int:photo_id>/delete/', methods = ['GET','POST'])
-@login_required
+@login_required #prevents users without accounts from deleting photos
 def deletePhoto(photo_id):
-  photoToDelete = db.session.query(Photo).filter_by(id = photo_id).one()
-  if(photoToDelete.user_id == current_user.id or current_user.is_admin):
+  photoToDelete = db.session.query(Photo).filter_by(id = photo_id).one() #allows you to call photos variables
+  if(photoToDelete.user_id == current_user.id or current_user.is_admin): #checks if user is publisher of photo
     fileResults = db.session.execute(text('select file from photo where id = ' + str(photo_id)))
     filename = fileResults.first()[0]
     filepath = os.path.join(current_app.config["UPLOAD_DIR"], filename)
@@ -87,8 +87,8 @@ def deletePhoto(photo_id):
     db.session.commit()
   
     flash('Photo id %s Successfully Deleted' % photo_id)
-    return redirect(url_for('main.homepage'))
+    return redirect(url_for('main.homepage')) #deletes image if publisher
   else:
     flash('You do not have permission to delete this photo!')
-    return redirect(url_for('main.homepage'))
+    return redirect(url_for('main.homepage')) #reloads homepage if not the publisher
 

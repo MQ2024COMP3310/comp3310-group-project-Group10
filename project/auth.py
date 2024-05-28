@@ -38,14 +38,17 @@ def signup_post():
     first_name = request.form.get('first name')
     last_name = request.form.get('last name')
     password = request.form.get('password')
-
-    user = db.session.execute(text('select * from user where email = "'+email+'"')).all()
+    
+    #email is sanitised to prevent sql injection
+    user = db.session.execute(text('select * from user where email = :email'), {'email': email}).all()
     if user:
         flash('Email address already exists')
         app.logger.warning("User signup failed")
-        return redirect(url_for('auth.signup'))
+        return redirect(url_for('auth.signup')) #reloads the page on failed signup
     
+    #hashes form password for secure storage
     hashed_pass = generate_password_hash(password)
+    #creates a new user with hashed password
     new_user = User(email=email, last_name = last_name, first_name=first_name, password=hashed_pass)
 
     db.session.add(new_user)
