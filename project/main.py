@@ -59,6 +59,9 @@ def newPhoto():
       flash("File must be an Image file (png, jpg, jpeg)", "error")
       return redirect(url_for('main.newPhoto'))
     
+    if file.tell() > 10485760:
+      flash("File too large!", "error")
+      return redirect(url_for('main.newPhoto'))
 
     filepath = os.path.abspath(os.path.join(current_app.config["UPLOAD_DIR"], secure_filename(file.filename)))
     file.save(filepath)
