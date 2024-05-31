@@ -15,7 +15,7 @@ main = Blueprint('main', __name__)
 # This is called when the home page is rendered. It fetches all images sorted by filename.
 @main.route('/')
 def homepage():
-  photos = db.session.query(Photo).order_by(asc(Photo.file))
+  photos = db.session.query(Photo).filter_by(public = True).order_by(asc(Photo.file))
   return render_template('index.html', photos = photos)
 
 @main.route('/uploads/<name>')
@@ -43,6 +43,7 @@ def newPhoto():
     newPhoto = Photo(name = request.form['user'], 
                     caption = request.form['caption'],
                     description = request.form['description'],
+                    #public = request.form['publicOpt'],
                     file = file.filename)
     db.session.add(newPhoto)
     flash('New Photo %s Successfully Created' % newPhoto.name)
@@ -92,7 +93,7 @@ def deletePhoto(photo_id):
     flash('You do not have permission to delete this photo!')
     return redirect(url_for('main.homepage')) #reloads homepage if not the publisher
   
-
+# This is called when directly navigating to the photo page.
 @main.route('/photo/<int:photo_id>/')
 def viewPhoto(photo_id):
   photo = db.session.query(Photo).filter_by(id = photo_id).one()
