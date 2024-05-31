@@ -8,6 +8,7 @@ from sqlalchemy import asc, text
 from . import db
 import os
 from werkzeug.utils import secure_filename
+from PIL import Image # this imports the Pillow's image module
 
 main = Blueprint('main', __name__)
 
@@ -21,6 +22,21 @@ def homepage():
 def display_file(name):
   return send_from_directory(current_app.config["UPLOAD_DIR"], name)
 
+# Check if the extension is a supported file type
+def allowed_image(filename):
+  allowed_extensions = {'png', 'jpg', 'jpeg'}
+  return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+# Verify that it is an image and not some other file with an image extension
+def is_image(file):
+  try:
+    img = Image.open(file)
+    img.verify() 
+    return True
+  except(IOError, SyntaxError) as e:
+    print(f"File is not an image: {e}")
+    return False
+  
 # Upload a new photo
 @main.route('/upload/', methods=['GET','POST'])
 def newPhoto():
@@ -34,6 +50,15 @@ def newPhoto():
     if not file or not file.filename:
       flash("No file selected!", "error")
       return redirect(url_for('main.newPhoto'))
+    
+    if not allowed_image(file.filename):
+      flash("File must be an Image file (png, jpg, jpeg)", "error")
+      return redirect(url_for('main.newPhoto'))
+    
+    if not is_image(file):
+      flash("File must be an Image file (png, jpg, jpeg)", "error")
+      return redirect(url_for('main.newPhoto'))
+    
 
     filepath = os.path.abspath(os.path.join(current_app.config["UPLOAD_DIR"], secure_filename(file.filename)))
     file.save(filepath)
