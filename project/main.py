@@ -15,9 +15,15 @@ main = Blueprint('main', __name__)
 # This is called when the home page is rendered. It fetches all images sorted by filename.
 @main.route('/')
 def homepage():
-  #implement here if/elseif for the second filter to change categories of photos to be displayed
-  photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file))
+  photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file)) 
   return render_template('index.html', photos = photos)
+
+  # if request.form['mainCategories'] == 'default' or request.form['mainCategories'] == None:
+  #   photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file))
+  #   return render_template('index.html', photos = photos)
+  # else:
+  #   photos = db.session.query(Photo).filter_by(public = True).filter_by(category = request.form['mainCategories']).order_by(asc(Photo.file))
+  #   return render_template('index.html', photos = photos)
 
 @main.route('/uploads/<name>')
 def display_file(name):
@@ -100,7 +106,3 @@ def deletePhoto(photo_id):
 def viewPhoto(photo_id):
   photo = db.session.query(Photo).filter_by(id = photo_id).one()
   return render_template('view.html', photo = photo)
-
-  
-  
-

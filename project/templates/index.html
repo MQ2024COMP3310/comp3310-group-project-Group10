@@ -20,6 +20,23 @@
   </div>
 </div>
 
+<form>
+<div class="input-container">
+    <label for="mainCategories">Search By Categories:</label>
+    <select id="mainCategories" name="mainCategories">
+        <option value="default">All</option>
+        <option value="animals">Animals</option>
+        <option value="nature">Nature</option>
+        <option value="architecture">Architecture</option>
+    </select>
+</div>
+
+<div class="input-container button green">
+    <input type="submit" value="Search">
+    <a href="{{ url_for('main.homepage') }}">Cancel</a>
+</div>
+</form>
+
 <div id="images" class="images-container" data-pagetype="{{ pagetype }}">
     {% for photo in photos %}
     <div class="image-box" data-id="{{photo.id}}">
