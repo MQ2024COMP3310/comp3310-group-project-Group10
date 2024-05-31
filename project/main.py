@@ -15,7 +15,8 @@ main = Blueprint('main', __name__)
 # This is called when the home page is rendered. It fetches all images sorted by filename.
 @main.route('/')
 def homepage():
-  photos = db.session.query(Photo).filter_by(public = True).order_by(asc(Photo.file))
+  #implement here if/elseif for the second filter to change categories of photos to be displayed
+  photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file))
   return render_template('index.html', photos = photos)
 
 @main.route('/uploads/<name>')
@@ -44,6 +45,7 @@ def newPhoto():
                     caption = request.form['caption'],
                     description = request.form['description'],
                     public = True if request.form['public'] == 'publicOpt' else False,
+                    category = None if request.form['category'] == 'default' else request.form['category'],
                     file = file.filename)
     db.session.add(newPhoto)
     flash('New Photo %s Successfully Created' % newPhoto.name)

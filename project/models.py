@@ -9,6 +9,7 @@ class Photo(db.Model):
     file = db.Column(db.String(250), nullable=False)
     description = db.Column(db.String(600), nullable=True)
     public = db.Column(db.Boolean, default = True)
+    category = db.Column(db.String(50), nullable=True)
 
     @property
     def serialize(self):
@@ -20,6 +21,7 @@ class Photo(db.Model):
            'file'         : self.file,
            'desc'         : self.description,
            'public'       : self.public,
+           'category'     : self.category
        }
  
 class User(UserMixin, db.Model):
