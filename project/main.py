@@ -43,7 +43,7 @@ def newPhoto():
     newPhoto = Photo(name = request.form['user'], 
                     caption = request.form['caption'],
                     description = request.form['description'],
-                    #public = request.form['publicOpt'],
+                    public = True if request.form['public'] == 'publicOpt' else False,
                     file = file.filename)
     db.session.add(newPhoto)
     flash('New Photo %s Successfully Created' % newPhoto.name)
