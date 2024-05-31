@@ -40,6 +40,14 @@ Upload a photo
             required></textarea>
     </div>
 
+    <div class="dropdown">
+        <label for="options">Would you like your image:</label>
+        <select id="options" name="options">
+            <option value="pubOption">Public</option>
+            <option value="privOption">Private</option>
+        </select>
+    </div>
+
     <div class="input-container button green">
         <input type="submit" value="Upload">
         <a href="{{ url_for('main.homepage') }}">Cancel</a>

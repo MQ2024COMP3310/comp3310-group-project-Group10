@@ -8,6 +8,7 @@ class Photo(db.Model):
     caption = db.Column(db.String(250), nullable=False)
     file = db.Column(db.String(250), nullable=False)
     description = db.Column(db.String(600), nullable=True)
+    public = db.Column(db.Boolean, default = True)
 
     @property
     def serialize(self):
@@ -18,6 +19,7 @@ class Photo(db.Model):
            'caption'      : self.caption,
            'file'         : self.file,
            'desc'         : self.description,
+           'public'       : self.public,
        }
  
 class User(UserMixin, db.Model):
@@ -27,6 +29,7 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     is_admin = db.Column(db.Boolean, default = False)
+
 
 
 

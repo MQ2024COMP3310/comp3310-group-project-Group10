@@ -91,4 +91,13 @@ def deletePhoto(photo_id):
   else:
     flash('You do not have permission to delete this photo!')
     return redirect(url_for('main.homepage')) #reloads homepage if not the publisher
+  
+
+@main.route('/photo/<int:photo_id>/')
+def viewPhoto(photo_id):
+  photo = db.session.query(Photo).filter_by(id = photo_id).one()
+  return render_template('view.html', photo = photo)
+
+  
+  
 

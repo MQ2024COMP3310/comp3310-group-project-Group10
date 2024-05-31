@@ -1,0 +1,33 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}
+View a photo
+{% endblock title %}
+
+{% block heading %}
+View a photo
+{% endblock heading %}
+
+{% block content %}
+<div class="photo">
+    <img class="image" src="{{ url_for('main.display_file', name=photo.file) }}" alt="image">
+    <div class="details">
+        <p><strong>User:</strong> {{ photo.name }}</p>
+        <p><strong>Caption:</strong> {{ photo.caption }}</p>
+        <p><strong>Description:</strong> {{ photo.description }}</p>
+        {% if photo.public == true %}
+        <p><strong>Visibility Setting: </strong>Public</p>
+        {% endif %}
+        {% if photo.public == false %}
+        <p><strong>Visibility Setting: </strong>Private</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="input-container button">
+    <a href="{{ url_for('main.homepage') }}">Back</a>
+</div>
+
+
+
+{% endblock content %}
