@@ -106,3 +106,8 @@ def deletePhoto(photo_id):
 def viewPhoto(photo_id):
   photo = db.session.query(Photo).filter_by(id = photo_id).one()
   return render_template('view.html', photo = photo)
+
+@main.route('/<string:category>/')
+def category(category):
+  photos = db.session.query(Photo).filter_by(public = True).filter_by(category = category).order_by(asc(Photo.file))
+  return render_template('index.html', photos = photos) 
