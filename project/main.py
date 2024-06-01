@@ -15,15 +15,9 @@ main = Blueprint('main', __name__)
 # This is called when the home page is rendered. It fetches all images sorted by filename.
 @main.route('/')
 def homepage():
-  photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file)) 
+  # Feature 3/4 from spec implementation (edited)
+  photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file))
   return render_template('index.html', photos = photos)
-
-  # if request.form['mainCategories'] == 'default' or request.form['mainCategories'] == None:
-  #   photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file))
-  #   return render_template('index.html', photos = photos)
-  # else:
-  #   photos = db.session.query(Photo).filter_by(public = True).filter_by(category = request.form['mainCategories']).order_by(asc(Photo.file))
-  #   return render_template('index.html', photos = photos)
 
 @main.route('/uploads/<name>')
 def display_file(name):
@@ -50,8 +44,8 @@ def newPhoto():
     newPhoto = Photo(name = request.form['user'], 
                     caption = request.form['caption'],
                     description = request.form['description'],
-                    public = True if request.form['public'] == 'publicOpt' else False,
-                    category = None if request.form['category'] == 'default' else request.form['category'],
+                    public = True if request.form['public'] == 'publicOpt' else False, # Feature 4 from spec implementation
+                    category = None if request.form['category'] == 'default' else request.form['category'], # Feature 3 from spec implementation
                     file = file.filename)
     db.session.add(newPhoto)
     flash('New Photo %s Successfully Created' % newPhoto.name)
@@ -107,6 +101,7 @@ def viewPhoto(photo_id):
   photo = db.session.query(Photo).filter_by(id = photo_id).one()
   return render_template('view.html', photo = photo)
 
+# Feature 3 from spec implementation
 @main.route('/<string:category>/')
 def category(category):
   photos = db.session.query(Photo).filter_by(public = True).filter_by(category = category).order_by(asc(Photo.file))

@@ -8,8 +8,8 @@ class Photo(db.Model):
     caption = db.Column(db.String(250), nullable=False)
     file = db.Column(db.String(250), nullable=False)
     description = db.Column(db.String(600), nullable=True)
-    public = db.Column(db.Boolean, default = True)
-    category = db.Column(db.String(50), nullable=True)
+    public = db.Column(db.Boolean, default = True) # Feature 4 from spec implementation
+    category = db.Column(db.String(50), nullable=True) # Feature 3 from spec implementation
 
     @property
     def serialize(self):
@@ -20,8 +20,8 @@ class Photo(db.Model):
            'caption'      : self.caption,
            'file'         : self.file,
            'desc'         : self.description,
-           'public'       : self.public,
-           'category'     : self.category
+           'public'       : self.public, # Feature 4 from spec implementation
+           'category'     : self.category # Feature 3 from spec implementation
        }
  
 class User(UserMixin, db.Model):
