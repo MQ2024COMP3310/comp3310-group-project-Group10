@@ -10,7 +10,8 @@ Upload a photo
 
 {% block content %}
 <form method="POST" enctype="multipart/form-data">
-    <div class="input-container button" title="File size should be under 1MB">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="input-container button" title="File size should be under 10MB">
         <!-- Accepts only .png, .jpg and .jpeg files.-->
         <input type="file" name="fileToUpload" accept=".png, .jpg, .jpeg">
     </div>
