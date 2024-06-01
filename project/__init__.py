@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 from pathlib import Path
-from flask_wtf.csrf import CSRFProtect 
+from flask_wtf.csrf import CSRFProtect # import csrf protection class
 
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
@@ -17,7 +17,7 @@ def create_app():
     app.config['UPLOAD_DIR'] = CWD / "uploads"
 
     db.init_app(app)
-    csrf.init_app(app)
+    csrf.init_app(app) # initialising global csrf protection
 
     # blueprint for non-auth parts of app
     from .main import main as main_blueprint
