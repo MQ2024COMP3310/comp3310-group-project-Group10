@@ -3,10 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from pathlib import Path
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect # import csrf protect class
 
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
 app = Flask(__name__)
+csrf = CSRFProtect()
 
 def create_app():
     
@@ -17,6 +19,7 @@ def create_app():
     app.config['UPLOAD_DIR'] = CWD / "uploads"
 
     db.init_app(app)
+    csrf.init_app(app) # initialise global csrf protection
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'

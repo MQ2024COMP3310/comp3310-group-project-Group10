@@ -1,3 +1,4 @@
+import imghdr
 from unittest import loader
 from flask import (
   Blueprint, render_template, request, 
@@ -12,6 +13,7 @@ import os
 from werkzeug.utils import secure_filename
 
 main = Blueprint('main', __name__)
+supported_filetypes = ['png', 'jpg', 'jpeg']
 
 # This is called when the home page is rendered. It fetches all images sorted by filename.
 @main.route('/')
@@ -23,6 +25,9 @@ def homepage():
 @main.route('/uploads/<name>')
 def display_file(name):
   return send_from_directory(current_app.config["UPLOAD_DIR"], name)
+
+def allowed_image(filename):
+  return '.' in filename and filename.rsplit('.', 1)[1].lower() in supported_filetypes
 
 # Upload a new photo
 @main.route('/upload/', methods=['GET','POST'])
@@ -37,7 +42,26 @@ def newPhoto():
 
     if not file or not file.filename:
       flash("No file selected!", "error")
-      return redirect(request.url)
+      return redirect(url_for('main.homepage')) # using in application redirection to prevent open redirect attacks
+
+    # checks file extension to make sure it's of a supported type
+    if not allowed_image(file.filename):
+      flash("File must be an Image file (png, jpg, jpeg)", "error")
+      return redirect(url_for('main.newPhoto'))
+    
+    # use built in python library to reduce 3rd party dependencies
+    # checks the file metadata and cross references to supported filetypes
+    # to ensure the uploaded image is an image file and not any other file
+    # with the extension changed.
+    if imghdr.what(file) not in supported_filetypes:
+      flash("File must be an Image file (png, jpg, jpeg)", "error")
+      return redirect(url_for('main.newPhoto'))
+    
+    # uses the tell() method to check size of file and makes sure it isn't
+    # larger than 10MB (HD photos are 5-10MB on average)
+    if file.tell() > 10485760:
+      flash("File too large!", "error")
+      return redirect(url_for('main.newPhoto'))
 
     filepath = os.path.join(current_app.config["UPLOAD_DIR"], secure_filename(file.filename)) # used secure_filename to prevent path traversal attacks by sanitising file names
     file.save(filepath)
