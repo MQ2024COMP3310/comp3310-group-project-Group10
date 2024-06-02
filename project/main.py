@@ -9,6 +9,7 @@ from .models import Photo, User
 from sqlalchemy import asc, text
 from . import db
 import os
+from werkzeug.utils import secure_filename
 
 main = Blueprint('main', __name__)
 
@@ -37,7 +38,7 @@ def newPhoto():
       flash("No file selected!", "error")
       return redirect(request.url)
 
-    filepath = os.path.join(current_app.config["UPLOAD_DIR"], file.filename)
+    filepath = os.path.join(current_app.config["UPLOAD_DIR"], secure_filename(file.filename)) # used secure_filename to prevent path traversal attacks by sanitising file names
     file.save(filepath)
 
     newPhoto = Photo(name = request.form['user'], 
@@ -79,11 +80,11 @@ def editPhoto(photo_id):
 def deletePhoto(photo_id):
   photoToDelete = db.session.query(Photo).filter_by(id = photo_id).one() #allows you to call photos variables
   if(photoToDelete.user_id == current_user.id or current_user.is_admin): #checks if user is publisher of photo
-    fileResults = db.session.execute(text('select file from photo where id = ' + str(photo_id)))
+    fileResults = db.session.execute(text('select file from photo where id = :photo_id'), {'photo_id': photo_id}) # parameterised queries to prevent SQL injection
     filename = fileResults.first()[0]
     filepath = os.path.join(current_app.config["UPLOAD_DIR"], filename)
     os.unlink(filepath)
-    db.session.execute(text('delete from photo where id = ' + str(photo_id)))
+    db.session.execute(text('delete from photo where id = :photo_id'), {'photo_id': photo_id}) # parameterised queries to prevent SQL injection
     db.session.commit()
   
     flash('Photo id %s Successfully Deleted' % photo_id)
