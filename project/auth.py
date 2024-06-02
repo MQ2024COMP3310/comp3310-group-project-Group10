@@ -1,3 +1,5 @@
+#(task 7)
+
 from flask import Blueprint, app, render_template, request,flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user
 from sqlalchemy import text

@@ -13,12 +13,12 @@ import os
 from werkzeug.utils import secure_filename
 
 main = Blueprint('main', __name__)
-supported_filetypes = ['png', 'jpg', 'jpeg']
+supported_filetypes = ['png', 'jpg', 'jpeg'] # (task 4)
 
 # This is called when the home page is rendered. It fetches all images sorted by filename.
 @main.route('/')
 def homepage():
-  # Feature 3/4 from spec implementation (edited)
+  # Feature 3/4 from spec implementation (task 9)
   photos = db.session.query(Photo).filter_by(public = True).filter_by(category = None).order_by(asc(Photo.file))
   return render_template('index.html', photos = photos)
 
@@ -31,7 +31,7 @@ def allowed_image(filename):
 
 # Upload a new photo
 @main.route('/upload/', methods=['GET','POST'])
-@login_required #prevents users without accounts from uploading photos
+@login_required #prevents users without accounts from uploading photos (task 7)
 def newPhoto():
   if request.method == 'POST':
     file = None
@@ -42,13 +42,15 @@ def newPhoto():
 
     if not file or not file.filename:
       flash("No file selected!", "error")
-      return redirect(url_for('main.homepage')) # using in application redirection to prevent open redirect attacks
+      return redirect(url_for('main.homepage')) # using in application redirection to prevent open redirect attacks (task 4)
 
+    # task 4
     # checks file extension to make sure it's of a supported type
     if not allowed_image(file.filename):
       flash("File must be an Image file (png, jpg, jpeg)", "error")
       return redirect(url_for('main.newPhoto'))
     
+    # task 4
     # use built in python library to reduce 3rd party dependencies
     # checks the file metadata and cross references to supported filetypes
     # to ensure the uploaded image is an image file and not any other file
@@ -56,21 +58,21 @@ def newPhoto():
     if imghdr.what(file) not in supported_filetypes:
       flash("File must be an Image file (png, jpg, jpeg)", "error")
       return redirect(url_for('main.newPhoto'))
-    
+    # task 4
     # uses the tell() method to check size of file and makes sure it isn't
     # larger than 10MB (HD photos are 5-10MB on average)
     if file.tell() > 10485760:
       flash("File too large!", "error")
       return redirect(url_for('main.newPhoto'))
 
-    filepath = os.path.join(current_app.config["UPLOAD_DIR"], secure_filename(file.filename)) # used secure_filename to prevent path traversal attacks by sanitising file names
+    filepath = os.path.join(current_app.config["UPLOAD_DIR"], secure_filename(file.filename)) # used secure_filename to prevent path traversal attacks by sanitising file names (task 4)
     file.save(filepath)
 
     newPhoto = Photo(name = request.form['user'], 
                     caption = request.form['caption'],
                     description = request.form['description'],
-                    public = True if request.form['public'] == 'publicOpt' else False, # Feature 4 from spec implementation
-                    category = None if request.form['category'] == 'default' else request.form['category'], # Feature 3 from spec implementation
+                    public = True if request.form['public'] == 'publicOpt' else False, # Feature 4 from spec implementation (task 9)
+                    category = None if request.form['category'] == 'default' else request.form['category'], # Feature 3 from spec implementation (task 9)
                     file = file.filename)
     db.session.add(newPhoto)
     flash('New Photo %s Successfully Created' % newPhoto.name)
@@ -81,10 +83,10 @@ def newPhoto():
 
 # This is called when clicking on Edit. Goes to the edit page.
 @main.route('/photo/<int:photo_id>/edit/', methods = ['GET', 'POST'])
-@login_required #prevents users without accounts from editing photos
+@login_required #prevents users without accounts from editing photos (task 7)
 def editPhoto(photo_id):
   editedPhoto = db.session.query(Photo).filter_by(id = photo_id).one()
-  if(editedPhoto.user_id == current_user.id or current_user.is_admin): #checks if user is publisher of photo
+  if(editedPhoto.user_id == current_user.id or current_user.is_admin): #checks if user is publisher of photo (task 7)
     if request.method == 'POST':
       if request.form['user']:
         editedPhoto.name = request.form['user']
@@ -103,15 +105,15 @@ def editPhoto(photo_id):
 
 # This is called when clicking on Delete. 
 @main.route('/photo/<int:photo_id>/delete/', methods = ['GET','POST'])
-@login_required #prevents users without accounts from deleting photos
+@login_required #prevents users without accounts from deleting photos (task 7)
 def deletePhoto(photo_id):
   photoToDelete = db.session.query(Photo).filter_by(id = photo_id).one() #allows you to call photos variables
-  if(photoToDelete.user_id == current_user.id or current_user.is_admin): #checks if user is publisher of photo
-    fileResults = db.session.execute(text('select file from photo where id = :photo_id'), {'photo_id': photo_id}) # parameterised queries to prevent SQL injection
+  if(photoToDelete.user_id == current_user.id or current_user.is_admin): #checks if user is publisher of photo (task 7)
+    fileResults = db.session.execute(text('select file from photo where id = :photo_id'), {'photo_id': photo_id}) # parameterised queries to prevent SQL injection (task 4)
     filename = fileResults.first()[0]
     filepath = os.path.join(current_app.config["UPLOAD_DIR"], filename)
     os.unlink(filepath)
-    db.session.execute(text('delete from photo where id = :photo_id'), {'photo_id': photo_id}) # parameterised queries to prevent SQL injection
+    db.session.execute(text('delete from photo where id = :photo_id'), {'photo_id': photo_id}) # parameterised queries to prevent SQL injection (task 4)
     db.session.commit()
   
     flash('Photo id %s Successfully Deleted' % photo_id)
@@ -126,7 +128,7 @@ def viewPhoto(photo_id):
   photo = db.session.query(Photo).filter_by(id = photo_id).one()
   return render_template('view.html', photo = photo)
 
-# Feature 3 from spec implementation
+# Feature 3 from spec implementation (task 9)
 @main.route('/<string:category>/')
 def category(category):
   photos = db.session.query(Photo).filter_by(public = True).filter_by(category = category).order_by(asc(Photo.file))

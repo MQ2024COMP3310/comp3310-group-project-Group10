@@ -10,7 +10,7 @@ Edit a photo
 
 {% block content %}
 <form method="POST" enctype="multipart/form-data" action="{{ url_for('main.editPhoto', photo_id=photo.id) }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>  <!-- Included CSRF token to protects against CSRF attacks -->
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>  <!-- Included CSRF token to protects against CSRF attacks (task 4)-->
   <div class="edit-container">
     <div class="image-box">
        <img class="image" src="{{ url_for('main.display_file', name=photo.file) }}" alt="image">

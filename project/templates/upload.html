@@ -10,9 +10,9 @@ Upload a photo
 
 {% block content %}
 <form method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>  <!-- Included CSRF token to protects against CSRF attacks -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>  <!-- Included CSRF token to protects against CSRF attacks (task 4)-->
     <div class="input-container button" title="File size should be under 1MB">
-        <!-- Accepts only .png, .jpg and .jpeg files.-->
+        <!-- Accepts only .png, .jpg and .jpeg files. (task 4)-->
         <input type="file" name="fileToUpload" accept=".png, .jpg, .jpeg">
     </div>
 
@@ -41,7 +41,7 @@ Upload a photo
             required></textarea>
     </div>
 
-    <!-- Feature 3 Implementation -->
+    <!-- Feature 3 Implementation (task 9)-->
     <div class="input-container"> 
         <label for="category">Category Tags:</label>
         <select id="category" name="category">
@@ -52,7 +52,7 @@ Upload a photo
         </select>
     </div>
 
-    <!-- Feature 4 Implementation -->
+    <!-- Feature 4 Implementation (task 9)-->
     <div class="input-container">
         <label for="public">Would you like your image:</label>
         <select id="public" name="public">
