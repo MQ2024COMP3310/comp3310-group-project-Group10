@@ -7,6 +7,8 @@ def populate_db():
    
     session = db.session()
 
+    # admin should be given to an account that should already be created
+    # this is not secure practice but simply there for testing purposes
     user = User(email = 'sav@gmail.com', password = generate_password_hash('sav'), first_name = 'sav', last_name='pav', is_admin = True)
     session.add(user)
     session.commit()
